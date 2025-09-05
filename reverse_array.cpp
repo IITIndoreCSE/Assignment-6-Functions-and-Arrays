@@ -1,24 +1,24 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 // Function declarations (DO NOT CHANGE)
-void displayArray(int arr[], int size);
-void reverseArray(int arr[], int size);
+void displayArray(const vector<int>& arr);
+void reverseArray(vector<int>& arr);
 
 // Function to display array elements (DO NOT CHANGE)
-void displayArray(int arr[], int size) {
+void displayArray(const vector<int>& arr) {
     cout << "Array: ";
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < arr.size(); i++) {
         cout << arr[i];
-        if (i < size - 1) cout << ", ";
+        if (i < arr.size() - 1) cout << ", ";
     }
     cout << endl;
 }
 
 // Function to reverse array in-place (without creating any new array)
-void reverseArray(int arr[], int size) {
-    //Write your code here
-  
+void reverseArray(vector<int>& arr) {
+    // Write your code here
 }
 
 //(DO NOT CHANGE)
@@ -27,19 +27,24 @@ int main() {
     cout << "Enter size of the array: ";
     cin >> size;
 
-    int numbers[size];
+    if (size <= 0) {
+        cout << "Invalid array size!" << endl;
+        return 1;
+    }
+
+    vector<int> numbers(size);
     cout << "Enter " << size << " elements: ";
     for (int i = 0; i < size; i++) {
         cin >> numbers[i];
     }
     
     cout << "Original Array: ";
-    displayArray(numbers, size);
+    displayArray(numbers);
     
-    reverseArray(numbers, size);
+    reverseArray(numbers);
     
     cout << "Reversed Array: ";
-    displayArray(numbers, size);
+    displayArray(numbers);
     
     return 0;
 }
