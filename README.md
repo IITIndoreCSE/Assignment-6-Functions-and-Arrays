@@ -17,7 +17,7 @@ Practice arrays, functions, and how they can be used together.
      - Finding the maximum element in the array
      - Finding the minimum element in the array
    - Sample input
-     `7`
+     `7`  
      `12 45 67 23 89 34 56`
    - Sample output
     Array: {12, 45, 67, 23, 89, 34, 56}
