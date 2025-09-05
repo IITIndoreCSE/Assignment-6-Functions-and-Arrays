@@ -24,12 +24,15 @@ int findSum(int arr[], int size) {
 
 // Function to find average of array elements
 double findAverage(int arr[], int size) {
+    if (size == 0) {
+        return 0.0;
+    }
     //write your code here
 }
 
 // Function to find maximum element in array
 int findMaximum(int arr[], int size) {
-    if (arr.empty()) {
+    if (size == 0) {
         cout << "Error: Empty array!" << endl;
         return 0;
     }
@@ -39,7 +42,7 @@ int findMaximum(int arr[], int size) {
 
 // Function to find minimum element in array
 int findMinimum(int arr[], int size) {
-    if (arr.empty()) {
+    if (size == 0) {
         cout << "Error: Empty array!" << endl;
         return 0;
     }
@@ -52,7 +55,6 @@ int main() {
     int SIZE;
     cout << "Enter size of array: ";
     cin >> SIZE;
-
     vector<int> numbers(SIZE);
     cout << "Enter " << SIZE << " elements:\n";
     for (int i = 0; i < SIZE; i++) {
@@ -60,23 +62,22 @@ int main() {
     }
     
     // Display the test array
-    displayArray(numbers, SIZE);
+    displayArray(numbers.data(), SIZE);
     cout << "Array size: " << SIZE << " elements" << endl;
-
     // Calculate and display sum
-    int sum = findSum(numbers, SIZE);
+    int sum = findSum(numbers.data(), SIZE);
     cout << "Sum of elements: " << sum << endl;
     
     // Calculate and display average
-    double average = findAverage(numbers, SIZE);
+    double average = findAverage(numbers.data(), SIZE);
     cout << "Average of elements: " << fixed << setprecision(2) << average << endl;
     
     // Find and display maximum
-    int maximum = findMaximum(numbers, SIZE);
+    int maximum = findMaximum(numbers.data(), SIZE);
     cout << "Maximum element: " << maximum << endl;
     
     // Find and display minimum
-    int minimum = findMinimum(numbers, SIZE);
+    int minimum = findMinimum(numbers.data(), SIZE);
     cout << "Minimum element: " << minimum << endl;
     
     return 0;
