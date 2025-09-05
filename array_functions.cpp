@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <vector>
 using namespace std;
 
 // Function declarations (DO NOT CHANGE)
@@ -28,7 +29,7 @@ double findAverage(int arr[], int size) {
 
 // Function to find maximum element in array
 int findMaximum(int arr[], int size) {
-    if (size == 0) {
+    if (arr.empty()) {
         cout << "Error: Empty array!" << endl;
         return 0;
     }
@@ -38,7 +39,7 @@ int findMaximum(int arr[], int size) {
 
 // Function to find minimum element in array
 int findMinimum(int arr[], int size) {
-    if (size == 0) {
+    if (arr.empty()) {
         cout << "Error: Empty array!" << endl;
         return 0;
     }
@@ -52,7 +53,7 @@ int main() {
     cout << "Enter size of array: ";
     cin >> SIZE;
 
-    int numbers[SIZE];
+    vector<int> numbers(SIZE);
     cout << "Enter " << SIZE << " elements:\n";
     for (int i = 0; i < SIZE; i++) {
         cin >> numbers[i];
