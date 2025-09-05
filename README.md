@@ -16,6 +16,16 @@ Practice arrays, functions, and how they can be used together.
      - Finding the average of all array elements
      - Finding the maximum element in the array
      - Finding the minimum element in the array
+   - Sample input
+     `7`
+     `12 45 67 23 89 34 56`
+   - Sample output
+     Array: {12, 45, 67, 23, 89, 34, 56}
+    Array size: 7 elements
+    Sum of elements: 326
+    Average of elements: 46.57
+    Maximum element: 89
+    Minimum element: 12
 3. `reverse_array.cpp`
    - In this program, you have to reverse the array
    - But, there is a catch. You cannot create another array or any data structure.
