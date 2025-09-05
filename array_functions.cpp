@@ -62,22 +62,22 @@ int main() {
     }
     
     // Display the test array
-    displayArray(numbers.data(), SIZE);
+    displayArray(numbers, SIZE);
     cout << "Array size: " << SIZE << " elements" << endl;
     // Calculate and display sum
-    int sum = findSum(numbers.data(), SIZE);
+    int sum = findSum(numbers, SIZE);
     cout << "Sum of elements: " << sum << endl;
     
     // Calculate and display average
-    double average = findAverage(numbers.data(), SIZE);
+    double average = findAverage(numbers, SIZE);
     cout << "Average of elements: " << fixed << setprecision(2) << average << endl;
     
     // Find and display maximum
-    int maximum = findMaximum(numbers.data(), SIZE);
+    int maximum = findMaximum(numbers, SIZE);
     cout << "Maximum element: " << maximum << endl;
     
     // Find and display minimum
-    int minimum = findMinimum(numbers.data(), SIZE);
+    int minimum = findMinimum(numbers, SIZE);
     cout << "Minimum element: " << minimum << endl;
     
     return 0;
