@@ -9,10 +9,10 @@ Practice arrays, functions, and how they can be used together.
 ## What to implement
 1. `calculator.cpp`
     - This program is a simple calculator you must write with functions. Just so you know – the function prototypes have already been declared for your convenience.
-    - Sample input
-      12
-      4
-    - Sample output
+    - Sample input  
+      12  
+      4  
+    - Sample output  
       Enter first number: Enter second number:   
 
       Calculator Results  
