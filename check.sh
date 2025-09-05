@@ -1,568 +1,108 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Unified test runner for Lab 6 (calculator.cpp, array_functions.cpp, reverse_array.cpp)
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
+set -u
 
-echo -e "${BLUE}================================================${NC}"
-echo -e "${BLUE}  C++ Programs Comprehensive Testing Suite     ${NC}"
-echo -e "${BLUE}================================================${NC}"
+CXX=${CXX:-g++}
+CXXFLAGS="-std=c++17 -O2 -Wall -Wextra -Werror -pedantic"
 
-# Global counters
-TOTAL_TESTS=0
-PASSED_TESTS=0
-FAILED_TESTS=0
+sources=(calculator.cpp array_functions.cpp reverse_array.cpp)
+binaries=(calculator array_functions reverse_array)
 
-# Function to compile a C++ program
-compile_program() {
-    local filename=$1
-    local program_name=$2
-    
-    echo -e "\n${YELLOW}Compiling ${program_name}...${NC}"
-    
-    # Check if source file exists
-    if [ ! -f "$filename" ]; then
-        echo -e "${RED}Error: $filename not found!${NC}"
-        return 1
-    fi
-    
-    # Compile the program
-    g++ -o "${filename%.cpp}" "$filename" 2> compilation_error.log
-    
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}Compilation failed for $filename${NC}"
-        echo -e "${RED}Error details:${NC}"
-        cat compilation_error.log
-        rm -f compilation_error.log
-        return 1
-    else
-        echo -e "${GREEN}✓ Compilation successful!${NC}"
-        rm -f compilation_error.log
-        return 0
-    fi
+compile() {
+  local src="$1" out="$2"
+  echo "Compiling $src -> $out"
+  $CXX $CXXFLAGS "$src" -o "$out"
 }
 
-# Function to run a test case
+pass=0
+fail=0
+total=0
+
 run_test() {
-    local executable=$1
-    local test_name=$2
-    local test_input=$3
-    local expected_pattern=$4
-    
-    TOTAL_TESTS=$((TOTAL_TESTS + 1))
-    
-    echo -e "\n${CYAN}Test Case: $test_name${NC}"
-    echo -e "${CYAN}${#test_name//?/-}----------${NC}"
-    
-    # Run the program with input
-    if [ -n "$test_input" ]; then
-        output=$(echo -e "$test_input" | "./$executable" 2>&1)
-    else
-        output=$("./$executable" 2>&1)
-    fi
-    
-    exit_code=$?
-    
-    echo -e "${BLUE}Input:${NC} $test_input"
-    echo -e "${BLUE}Output:${NC}"
+  local exe="$1" input="$2" expected="$3"
+  ((total++))
+  local output
+  output="$(echo -e "$input" | "./$exe")"
+  # Normalize CRLF just in case
+  output="$(echo -n "$output" | tr -d '\r')"
+  if [[ "$output" == "$expected" ]]; then
+    echo "✓ $exe <$input> => PASS"
+    ((pass++))
+  else
+    echo "✗ $exe <$input> => FAIL"
+    echo "   expected:"
+    echo "$expected"
+    echo "   got:"
     echo "$output"
-    
-    # Check if program executed successfully
-    if [ $exit_code -ne 0 ]; then
-        echo -e "${RED}✗ Test FAILED - Program crashed or returned error${NC}"
-        FAILED_TESTS=$((FAILED_TESTS + 1))
-        return 1
-    fi
-    
-    # Check expected pattern if provided
-    if [ -n "$expected_pattern" ]; then
-        if echo "$output" | grep -q "$expected_pattern"; then
-            echo -e "${GREEN}✓ Test PASSED - Expected pattern found${NC}"
-            PASSED_TESTS=$((PASSED_TESTS + 1))
-            return 0
-        else
-            echo -e "${RED}✗ Test FAILED - Expected pattern '$expected_pattern' not found${NC}"
-            FAILED_TESTS=$((FAILED_TESTS + 1))
-            return 1
-        fi
-    else
-        echo -e "${GREEN}✓ Test PASSED - Program executed successfully${NC}"
-        PASSED_TESTS=$((PASSED_TESTS + 1))
-        return 0
-    fi
+    ((fail++))
+  fi
 }
 
-# Test Array Functions Program
-test_array_functions() {
-    echo -e "\n${PURPLE}========================================${NC}"
-    echo -e "${PURPLE}  TESTING ARRAY FUNCTIONS PROGRAM      ${NC}"
-    echo -e "${PURPLE}========================================${NC}"
-    
-    if ! compile_program "array_functions.cpp" "Array Functions Program"; then
-        echo -e "${RED}Skipping tests due to compilation failure${NC}"
-        return 1
-    fi
-    
-    # Test Case 1: Basic functionality with provided array
-    run_test "array_functions" "Basic Array Operations" "" "Array: {12, 45, 67, 23, 89, 34, 56}"
-    
-    # Since we can't modify the main function, we'll create test versions
-    # Create a test version with different array values
-    cat > test_array1.cpp << 'EOF'
-#include <iostream>
-#include <iomanip>
-using namespace std;
+# --- Compile all sources ---
+for i in "${!sources[@]}"; do
+  compile "${sources[$i]}" "${binaries[$i]}" || { echo "Compilation failed for ${sources[$i]}"; exit 1; }
+done
 
-void displayArray(int arr[], int size);
-int findSum(int arr[], int size);
-double findAverage(int arr[], int size);
-int findMaximum(int arr[], int size);
-int findMinimum(int arr[], int size);
+echo
+echo "== Running tests =="
 
-// Copy your implementations here (assuming they're correct)
-void displayArray(int arr[], int size) {
-    cout << "Array: {";
-    for (int i = 0; i < size; i++) {
-        cout << arr[i];
-        if (i < size - 1) {
-            cout << ", ";
-        }
-    }
-    cout << "}" << endl;
-}
+########################################
+# Tests for array_functions.cpp (4 cases)
+########################################
+# Default array {12,45,67,23,89,34,56}
+run_test array_functions "" \
+$'Array: {12, 45, 67, 23, 89, 34, 56}\nArray size: 7 elements\nSum of elements: 326\nAverage of elements: 46.57\nMaximum element: 89\nMinimum element: 12'
 
-int findSum(int arr[], int size) {
-    int sum = 0;
-    for (int i = 0; i < size; i++) {
-        sum += arr[i];
-    }
-    return sum;
-}
+# Single element {5}
+run_test array_functions "" \
+$'Array: {5}\nArray size: 1 elements\nSum of elements: 5\nAverage of elements: 5.00\nMaximum element: 5\nMinimum element: 5'
 
-double findAverage(int arr[], int size) {
-    if (size == 0) return 0.0;
-    return static_cast<double>(findSum(arr, size)) / size;
-}
+# Two elements {10, -10}
+run_test array_functions "" \
+$'Array: {10, -10}\nArray size: 2 elements\nSum of elements: 0\nAverage of elements: 0.00\nMaximum element: 10\nMinimum element: -10'
 
-int findMaximum(int arr[], int size) {
-    if (size == 0) {
-        cout << "Error: Empty array!" << endl;
-        return 0;
-    }
-    int max = arr[0];
-    for (int i = 1; i < size; i++) {
-        if (arr[i] > max) {
-            max = arr[i];
-        }
-    }
-    return max;
-}
+# Empty array
+run_test array_functions "" \
+$'Array: {}\nArray size: 0 elements\nSum of elements: 0\nAverage of elements: 0.00\nError: Empty array!\nMaximum element: 0\nError: Empty array!\nMinimum element: 0'
 
-int findMinimum(int arr[], int size) {
-    if (size == 0) {
-        cout << "Error: Empty array!" << endl;
-        return 0;
-    }
-    int min = arr[0];
-    for (int i = 1; i < size; i++) {
-        if (arr[i] < min) {
-            min = arr[i];
-        }
-    }
-    return min;
-}
+########################################
+# Tests for calculator.cpp (8 cases)
+########################################
+run_test calculator "12\n4\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: 12 and 4\n=========================================\nAddition: 12 + 4 = 16\nSubtraction: 12 - 4 = 8\nMultiplication: 12 * 4 = 48\nDivision: 12 / 4 = 3\n========================================='
 
-int main() {
-    // Test Case: Single element array
-    const int SIZE1 = 1;
-    int numbers1[SIZE1] = {42};
-    
-    displayArray(numbers1, SIZE1);
-    cout << "Sum: " << findSum(numbers1, SIZE1) << endl;
-    cout << "Average: " << fixed << setprecision(2) << findAverage(numbers1, SIZE1) << endl;
-    cout << "Maximum: " << findMaximum(numbers1, SIZE1) << endl;
-    cout << "Minimum: " << findMinimum(numbers1, SIZE1) << endl;
-    
-    return 0;
-}
-EOF
+run_test calculator "-5\n3\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: -5 and 3\n=========================================\nAddition: -5 + 3 = -2\nSubtraction: -5 - 3 = -8\nMultiplication: -5 * 3 = -15\nDivision: -5 / 3 = -1.66667\n========================================='
 
-    g++ -o test_array1 test_array1.cpp 2>/dev/null
-    if [ $? -eq 0 ]; then
-        run_test "test_array1" "Single Element Array" "" "Array: {42}"
-        rm -f test_array1
-    fi
-    rm -f test_array1.cpp
+run_test calculator "-7\n-2\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: -7 and -2\n=========================================\nAddition: -7 + -2 = -9\nSubtraction: -7 - -2 = -5\nMultiplication: -7 * -2 = 14\nDivision: -7 / -2 = 3.5\n========================================='
 
-    # Test Case: Negative numbers
-    cat > test_array2.cpp << 'EOF'
-#include <iostream>
-#include <iomanip>
-using namespace std;
+run_test calculator "0\n10\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: 0 and 10\n=========================================\nAddition: 0 + 10 = 10\nSubtraction: 0 - 10 = -10\nMultiplication: 0 * 10 = 0\nDivision: 0 / 10 = 0\n========================================='
 
-void displayArray(int arr[], int size);
-int findSum(int arr[], int size);
-double findAverage(int arr[], int size);
-int findMaximum(int arr[], int size);
-int findMinimum(int arr[], int size);
+run_test calculator "10\n0\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: 10 and 0\n=========================================\nAddition: 10 + 0 = 10\nSubtraction: 10 - 0 = 10\nMultiplication: 10 * 0 = 0\nError: Division by zero!\nDivision: 10 / 0 = 0\n========================================='
 
-void displayArray(int arr[], int size) {
-    cout << "Array: {";
-    for (int i = 0; i < size; i++) {
-        cout << arr[i];
-        if (i < size - 1) cout << ", ";
-    }
-    cout << "}" << endl;
-}
+run_test calculator "3.5\n1.5\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: 3.5 and 1.5\n=========================================\nAddition: 3.5 + 1.5 = 5\nSubtraction: 3.5 - 1.5 = 2\nMultiplication: 3.5 * 1.5 = 5.25\nDivision: 3.5 / 1.5 = 2.33333\n========================================='
 
-int findSum(int arr[], int size) {
-    int sum = 0;
-    for (int i = 0; i < size; i++) {
-        sum += arr[i];
-    }
-    return sum;
-}
+run_test calculator "1000000\n1000000\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: 1000000 and 1000000\n=========================================\nAddition: 1000000 + 1000000 = 2000000\nSubtraction: 1000000 - 1000000 = 0\nMultiplication: 1000000 * 1000000 = 1e+12\nDivision: 1000000 / 1000000 = 1\n========================================='
 
-double findAverage(int arr[], int size) {
-    if (size == 0) return 0.0;
-    return static_cast<double>(findSum(arr, size)) / size;
-}
+run_test calculator "7\n1\n" \
+$'Enter first number: Enter second number: \n========== CALCULATOR RESULTS ==========\nNumbers: 7 and 1\n=========================================\nAddition: 7 + 1 = 8\nSubtraction: 7 - 1 = 6\nMultiplication: 7 * 1 = 7\nDivision: 7 / 1 = 7\n========================================='
 
-int findMaximum(int arr[], int size) {
-    if (size == 0) {
-        cout << "Error: Empty array!" << endl;
-        return 0;
-    }
-    int max = arr[0];
-    for (int i = 1; i < size; i++) {
-        if (arr[i] > max) max = arr[i];
-    }
-    return max;
-}
+########################################
+# Tests for reverse_array.cpp (2 cases)
+########################################
+run_test reverse_array "" \
+$'========== ARRAY REVERSAL PROGRAM ==========\nOriginal Array: 1, 2, 3, 4, 5\nReversed Array: 5, 4, 3, 2, 1'
 
-int findMinimum(int arr[], int size) {
-    if (size == 0) {
-        cout << "Error: Empty array!" << endl;
-        return 0;
-    }
-    int min = arr[0];
-    for (int i = 1; i < size; i++) {
-        if (arr[i] < min) min = arr[i];
-    }
-    return min;
-}
+run_test reverse_array "" \
+$'========== ARRAY REVERSAL PROGRAM ==========\nOriginal Array: 10, 20, 30, 40\nReversed Array: 40, 30, 20, 10'
 
-int main() {
-    const int SIZE = 5;
-    int numbers[SIZE] = {-10, 5, -3, 0, 8};
-    
-    displayArray(numbers, SIZE);
-    cout << "Sum: " << findSum(numbers, SIZE) << endl;
-    cout << "Average: " << fixed << setprecision(2) << findAverage(numbers, SIZE) << endl;
-    cout << "Maximum: " << findMaximum(numbers, SIZE) << endl;
-    cout << "Minimum: " << findMinimum(numbers, SIZE) << endl;
-    
-    return 0;
-}
-EOF
-
-    g++ -o test_array2 test_array2.cpp 2>/dev/null
-    if [ $? -eq 0 ]; then
-        run_test "test_array2" "Array with Negative Numbers" "" "Array: {-10, 5, -3, 0, 8}"
-        rm -f test_array2
-    fi
-    rm -f test_array2.cpp
-    
-    rm -f array_functions
-}
-
-# Test Calculator Program
-test_calculator() {
-    echo -e "\n${PURPLE}========================================${NC}"
-    echo -e "${PURPLE}  TESTING CALCULATOR PROGRAM           ${NC}"
-    echo -e "${PURPLE}========================================${NC}"
-    
-    if ! compile_program "calculator.cpp" "Calculator Program"; then
-        echo -e "${RED}Skipping tests due to compilation failure${NC}"
-        return 1
-    fi
-    
-    # Test Case 1: Positive numbers
-    run_test "calculator" "Positive Numbers" "10.5\n3.2" "10.5.*3.2"
-    
-    # Test Case 2: Integer numbers
-    run_test "calculator" "Integer Numbers" "15\n4" "15.*4"
-    
-    # Test Case 3: Negative numbers
-    run_test "calculator" "Negative Numbers" "-8.5\n2.3" "-8.5.*2.3"
-    
-    # Test Case 4: Division by zero
-    run_test "calculator" "Division by Zero" "10\n0" "10.*0"
-    
-    # Test Case 5: Zero operations
-    run_test "calculator" "Operations with Zero" "0\n5.5" "0.*5.5"
-    
-    # Test Case 6: Large numbers
-    run_test "calculator" "Large Numbers" "999999.99\n0.001" "999999.99.*0.001"
-    
-    # Test Case 7: Decimal precision
-    run_test "calculator" "Decimal Precision" "1.111\n2.222" "1.111.*2.222"
-    
-    rm -f calculator
-}
-
-# Test Reverse Array Program
-test_reverse_array() {
-    echo -e "\n${PURPLE}========================================${NC}"
-    echo -e "${PURPLE}  TESTING REVERSE ARRAY PROGRAM        ${NC}"
-    echo -e "${PURPLE}========================================${NC}"
-    
-    if ! compile_program "reverse_array.cpp" "Reverse Array Program"; then
-        echo -e "${RED}Skipping tests due to compilation failure${NC}"
-        return 1
-    fi
-    
-    # Test Case 1: Basic functionality with provided array
-    run_test "reverse_array" "Basic Array Reversal" "" "Reversed Array: 5, 4, 3, 2, 1"
-    
-    # Create additional test cases
-    # Test Case 2: Single element array
-    cat > test_reverse1.cpp << 'EOF'
-#include <iostream>
-using namespace std;
-
-void displayArray(int arr[], int size) {
-    cout << "Array: ";
-    for (int i = 0; i < size; i++) {
-        cout << arr[i];
-        if (i < size - 1) cout << ", ";
-    }
-    cout << endl;
-}
-
-void reverseArray(int arr[], int size) {
-    int start = 0;
-    int end = size - 1;
-    while (start < end) {
-        int temp = arr[start];
-        arr[start] = arr[end];
-        arr[end] = temp;
-        start++;
-        end--;
-    }
-}
-
-int main() {
-    const int SIZE = 1;
-    int numbers[SIZE] = {42};
-    
-    cout << "Original ";
-    displayArray(numbers, SIZE);
-    reverseArray(numbers, SIZE);
-    cout << "Reversed ";
-    displayArray(numbers, SIZE);
-    
-    return 0;
-}
-EOF
-
-    g++ -o test_reverse1 test_reverse1.cpp 2>/dev/null
-    if [ $? -eq 0 ]; then
-        run_test "test_reverse1" "Single Element Array" "" "Reversed Array: 42"
-        rm -f test_reverse1
-    fi
-    rm -f test_reverse1.cpp
-
-    # Test Case 3: Even number of elements
-    cat > test_reverse2.cpp << 'EOF'
-#include <iostream>
-using namespace std;
-
-void displayArray(int arr[], int size) {
-    cout << "Array: ";
-    for (int i = 0; i < size; i++) {
-        cout << arr[i];
-        if (i < size - 1) cout << ", ";
-    }
-    cout << endl;
-}
-
-void reverseArray(int arr[], int size) {
-    int start = 0;
-    int end = size - 1;
-    while (start < end) {
-        int temp = arr[start];
-        arr[start] = arr[end];
-        arr[end] = temp;
-        start++;
-        end--;
-    }
-}
-
-int main() {
-    const int SIZE = 6;
-    int numbers[SIZE] = {10, 20, 30, 40, 50, 60};
-    
-    cout << "Original ";
-    displayArray(numbers, SIZE);
-    reverseArray(numbers, SIZE);
-    cout << "Reversed ";
-    displayArray(numbers, SIZE);
-    
-    return 0;
-}
-EOF
-
-    g++ -o test_reverse2 test_reverse2.cpp 2>/dev/null
-    if [ $? -eq 0 ]; then
-        run_test "test_reverse2" "Even Number of Elements" "" "Reversed Array: 60, 50, 40, 30, 20, 10"
-        rm -f test_reverse2
-    fi
-    rm -f test_reverse2.cpp
-
-    # Test Case 4: Array with negative numbers
-    cat > test_reverse3.cpp << 'EOF'
-#include <iostream>
-using namespace std;
-
-void displayArray(int arr[], int size) {
-    cout << "Array: ";
-    for (int i = 0; i < size; i++) {
-        cout << arr[i];
-        if (i < size - 1) cout << ", ";
-    }
-    cout << endl;
-}
-
-void reverseArray(int arr[], int size) {
-    int start = 0;
-    int end = size - 1;
-    while (start < end) {
-        int temp = arr[start];
-        arr[start] = arr[end];
-        arr[end] = temp;
-        start++;
-        end--;
-    }
-}
-
-int main() {
-    const int SIZE = 7;
-    int numbers[SIZE] = {-5, -10, 0, 15, -20, 25, -30};
-    
-    cout << "Original ";
-    displayArray(numbers, SIZE);
-    reverseArray(numbers, SIZE);
-    cout << "Reversed ";
-    displayArray(numbers, SIZE);
-    
-    return 0;
-}
-EOF
-
-    g++ -o test_reverse3 test_reverse3.cpp 2>/dev/null
-    if [ $? -eq 0 ]; then
-        run_test "test_reverse3" "Array with Negative Numbers" "" "Reversed Array: -30, 25, -20, 15, 0, -10, -5"
-        rm -f test_reverse3
-    fi
-    rm -f test_reverse3.cpp
-
-    # Test Case 5: Two element array
-    cat > test_reverse4.cpp << 'EOF'
-#include <iostream>
-using namespace std;
-
-void displayArray(int arr[], int size) {
-    cout << "Array: ";
-    for (int i = 0; i < size; i++) {
-        cout << arr[i];
-        if (i < size - 1) cout << ", ";
-    }
-    cout << endl;
-}
-
-void reverseArray(int arr[], int size) {
-    int start = 0;
-    int end = size - 1;
-    while (start < end) {
-        int temp = arr[start];
-        arr[start] = arr[end];
-        arr[end] = temp;
-        start++;
-        end--;
-    }
-}
-
-int main() {
-    const int SIZE = 2;
-    int numbers[SIZE] = {100, 200};
-    
-    cout << "Original ";
-    displayArray(numbers, SIZE);
-    reverseArray(numbers, SIZE);
-    cout << "Reversed ";
-    displayArray(numbers, SIZE);
-    
-    return 0;
-}
-EOF
-
-    g++ -o test_reverse4 test_reverse4.cpp 2>/dev/null
-    if [ $? -eq 0 ]; then
-        run_test "test_reverse4" "Two Element Array" "" "Reversed Array: 200, 100"
-        rm -f test_reverse4
-    fi
-    rm -f test_reverse4.cpp
-    
-    rm -f reverse_array
-}
-
-# Main execution
-main() {
-    echo -e "${CYAN}Starting comprehensive test suite...${NC}\n"
-    
-    # Run all test suites
-    test_array_functions
-    test_calculator  
-    test_reverse_array
-    
-    # Final summary
-    echo -e "\n${BLUE}================================================${NC}"
-    echo -e "${BLUE}           FINAL TEST RESULTS SUMMARY           ${NC}"
-    echo -e "${BLUE}================================================${NC}"
-    echo -e "${CYAN}Total Tests Run: $TOTAL_TESTS${NC}"
-    echo -e "${GREEN}Tests Passed: $PASSED_TESTS${NC}"
-    echo -e "${RED}Tests Failed: $FAILED_TESTS${NC}"
-    
-    if [ $FAILED_TESTS -eq 0 ]; then
-        echo -e "\n${GREEN}🎉 ALL TESTS PASSED! Great job!${NC}"
-        echo -e "${GREEN}Your implementations are working correctly.${NC}"
-    else
-        echo -e "\n${YELLOW}⚠️  Some tests failed. Please review your implementations.${NC}"
-        echo -e "${YELLOW}Check the failed test outputs above for debugging.${NC}"
-    fi
-    
-    # Success rate
-    if [ $TOTAL_TESTS -gt 0 ]; then
-        SUCCESS_RATE=$(echo "scale=1; $PASSED_TESTS * 100 / $TOTAL_TESTS" | bc -l 2>/dev/null || echo "N/A")
-        echo -e "${CYAN}Success Rate: $SUCCESS_RATE%${NC}"
-    fi
-    
-    echo -e "\n${BLUE}================================================${NC}"
-    
-    # Cleanup any remaining files
-    rm -f test_*.cpp test_array* test_reverse* compilation_error.log
-}
-
-# Check if bc is available for percentage calculation
-if ! command -v bc &> /dev/null; then
-    echo -e "${YELLOW}Note: 'bc' calculator not found. Success rate calculation will be skipped.${NC}"
-fi
-
-# Run the main function
-main
+########################################
+echo
+echo "Summary: Passed=$pass Failed=$fail Total=$total"
+[[ $fail -eq 0 ]] && exit 0 || exit 1
