@@ -4,26 +4,26 @@
 using namespace std;
 
 // Function declarations (DO NOT CHANGE)
-void displayArray(int arr[], int size);
-int findSum(int arr[], int size);
-double findAverage(int arr[], int size);
-int findMaximum(int arr[], int size);
-int findMinimum(int arr[], int size);
+void displayArray(vector<int> arr, int size);
+int findSum(vector<int> arr, int size);
+double findAverage(vector<int> arr, int size);
+int findMaximum(vector<int> arr, int size);
+int findMinimum(vector<int> arr, int size);
 
 // Function to display array elements
-void displayArray(int arr[], int size) {
+void displayArray(vector<int> arr, int size) {
     cout << "Array: {";
     //write your code here
     cout << "}" << endl;
 }
 
 // Function to find sum of all array elements
-int findSum(int arr[], int size) {
+int findSum(vector<int> arr, int size) {
   //write your code here
 }
 
 // Function to find average of array elements
-double findAverage(int arr[], int size) {
+double findAverage(vector<int> arr, int size) {
     if (size == 0) {
         return 0.0;
     }
@@ -31,7 +31,7 @@ double findAverage(int arr[], int size) {
 }
 
 // Function to find maximum element in array
-int findMaximum(int arr[], int size) {
+int findMaximum(vector<int> arr, int size) {
     if (size == 0) {
         cout << "Error: Empty array!" << endl;
         return 0;
@@ -41,7 +41,7 @@ int findMaximum(int arr[], int size) {
 }
 
 // Function to find minimum element in array
-int findMinimum(int arr[], int size) {
+int findMinimum(vector<int> arr, int size) {
     if (size == 0) {
         cout << "Error: Empty array!" << endl;
         return 0;
