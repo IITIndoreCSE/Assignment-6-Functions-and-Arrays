@@ -26,24 +26,19 @@ double divide(double a, double b);
 //DO NOT CHANGE
 int main() {
     double num1, num2;
-    
-    // Get input from user
+   
     cout << "Enter first number: ";
     cin >> num1;
     cout << "Enter second number: ";
     cin >> num2;
     
-    cout << "\n========== CALCULATOR RESULTS ==========" << endl;
+    cout << "\nCalculator Results" << endl;
     cout << "Numbers: " << num1 << " and " << num2 << endl;
-    cout << "=========================================" << endl;
     
-    // Demonstrate all operations
-    cout << "Addition: " << num1 << " + " << num2 << " = " << add(num1, num2) << endl;
-    cout << "Subtraction: " << num1 << " - " << num2 << " = " << subtract(num1, num2) << endl;
-    cout << "Multiplication: " << num1 << " * " << num2 << " = " << multiply(num1, num2) << endl;
-    cout << "Division: " << num1 << " / " << num2 << " = " << divide(num1, num2) << endl;
-    
-    cout << "=========================================" << endl;
+    cout << "Addition: " << add(num1, num2) << endl;
+    cout << "Subtraction: " << subtract(num1, num2) << endl;
+    cout << "Multiplication: " << multiply(num1, num2) << endl;
+    cout << "Division: " << divide(num1, num2) << endl;
     
     return 0;
 }
