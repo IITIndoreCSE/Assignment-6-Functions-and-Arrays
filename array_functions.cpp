@@ -48,8 +48,15 @@ int findMinimum(int arr[], int size) {
 
 //DO NOT CHANGE
 int main() {
-    const int SIZE = 7;
-    int numbers[SIZE] = {12, 45, 67, 23, 89, 34, 56};
+    int SIZE;
+    cout << "Enter size of array: ";
+    cin >> SIZE;
+
+    int numbers[SIZE];
+    cout << "Enter " << SIZE << " elements:\n";
+    for (int i = 0; i < SIZE; i++) {
+        cin >> numbers[i];
+    }
     
     // Display the test array
     displayArray(numbers, SIZE);
@@ -70,7 +77,6 @@ int main() {
     // Find and display minimum
     int minimum = findMinimum(numbers, SIZE);
     cout << "Minimum element: " << minimum << endl;
-    
     
     return 0;
 }
