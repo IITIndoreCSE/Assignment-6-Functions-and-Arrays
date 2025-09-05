@@ -41,7 +41,14 @@ Practice arrays, functions, and how they can be used together.
 4. `reverse_array.cpp`
    - In this program, you have to reverse the array
    - But, there is a catch. You cannot create another array or any data structure.
-
+   - Sample input  
+     5
+     10 20 30 40 50
+   - Sample output  
+     Enter size of the array: 5
+     Enter 5 elements: 10 20 30 40 50
+     Original Array: 10 20 30 40 50  
+     Reversed Array: 50 40 30 20 10  
 ## What do you need to do?
 1. Download this repository as a .zip.
 2. Extract all folders and remember the location.
