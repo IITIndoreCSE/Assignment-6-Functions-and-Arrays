@@ -15,7 +15,7 @@ Practice arrays, functions, and how they can be used together.
     - Sample output
       Enter first number: Enter second number:   
 
-      ========== CALCULATOR RESULTS ==========  
+      `========== CALCULATOR RESULTS ==========  `
       Numbers: 12 and 4  
       =========================================  
       Addition: 12 + 4 = 16  
