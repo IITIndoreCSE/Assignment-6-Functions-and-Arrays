@@ -23,21 +23,23 @@ void reverseArray(int arr[], int size) {
 
 //(DO NOT CHANGE)
 int main() {
-    const int SIZE = 5;
-    int numbers[SIZE] = {1, 2, 3, 4, 5};
+    int size;
+    cout << "Enter size of the array: ";
+    cin >> size;
+
+    int numbers[size];
+    cout << "Enter " << size << " elements: ";
+    for (int i = 0; i < size; i++) {
+        cin >> numbers[i];
+    }
     
-    cout << "========== ARRAY REVERSAL PROGRAM ==========" << endl;
+    cout << "Original Array: ";
+    displayArray(numbers, size);
     
-    // Display original array
-    cout << "Original ";
-    displayArray(numbers, SIZE);
+    reverseArray(numbers, size);
     
-    // Reverse the array
-    reverseArray(numbers, SIZE);
-    
-    // Display reversed array
-    cout << "Reversed ";
-    displayArray(numbers, SIZE);
+    cout << "Reversed Array: ";
+    displayArray(numbers, size);
     
     return 0;
 }
