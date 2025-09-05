@@ -15,14 +15,12 @@ Practice arrays, functions, and how they can be used together.
     - Sample output
       Enter first number: Enter second number:   
 
-      `========== CALCULATOR RESULTS ==========  `
+      Calculator Results  
       Numbers: 12 and 4  
-      =========================================  
-      Addition: 12 + 4 = 16  
-      Subtraction: 12 - 4 = 8  
-      Multiplication: 12 * 4 = 48  
-      Division: 12 / 4 = 3  
-      =========================================  
+      Addition: 16  
+      Subtraction: 8  
+      Multiplication: 48  
+      Division: 3  
 2. `array_functions.cpp`
    - In this program, you have to use functions for performing operations on an array, namely:
      - Displaying(printing) the array
